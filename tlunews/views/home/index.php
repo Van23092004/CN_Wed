@@ -1,98 +1,76 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>News List</title>
-    <link rel="stylesheet" href="styles.css"> <!-- Tạo file styles.css để làm đẹp giao diện -->
+    <title>Trang Chủ - Tin Tức</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-    <h2>Latest News</h2>
-
-    <!-- Form tìm kiếm -->
-    <form method="GET" action="index.php?action=search">
-        <input type="text" name="keyword" placeholder="Search news..." required>
-        <input type="submit" value="Search">
-    </form>
-
-    <!-- Lọc tin tức theo danh mục -->
-    <form method="GET" action="index.php?action=filter">
-        <label for="category">Select Category:</label>
-        <select name="categoryId" id="category">
-            <option value="">All Categories</option>
-            <?php foreach ($categoryList as $category): ?>
-                <option value="<?= $category['id'] ?>"><?= htmlspecialchars($category['name']) ?></option>
-            <?php endforeach; ?>
-        </select>
-        <input type="submit" value="Filter">
-    </form>
-
-    <ul>
-        <?php foreach ($newsList as $news): ?>
-            <li>
-                <a href="index.php?action=detail&id=<?= $news['id'] ?>">
-                    <?= htmlspecialchars($news['title']) ?>
-                </a>
-                <p><?= htmlspecialchars(substr($news['content'], 0, 100)) ?>...</p> <!-- Hiển thị đoạn tóm tắt -->
-            </li>
-        <?php endforeach; ?>
-    </ul>
-</body>
-</html>
-
-<?php include 'views/header.php'; ?>
-
-<div class="row">
-    <div class="col-md-8">
-        <div class="d-flex justify-content-between">
-            <h2 class="mb-4 mt-auto">Tin Tức</h2>
-            <div class="d-flex  mt-4 mb-4">
-    <input type="text" class="form-control form-control-sm" placeholder="Tìm kiếm...">
-    <button class="btn btn-sm bi bi-search btn-success"></button>
-</div>
+    <!-- Thanh điều hướng -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Trang Tin Tức</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="index.php">Trang Chủ</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.php?controller=home&action=search">Tìm kiếm</a>
+                    </li>
+                </ul>
+            </div>
         </div>
-        <?php foreach ($_SESSION['news'] as $item): ?>
-            <div class="card mb-4">
-                <div class="row g-0">
-                    <div class="col-md-4">
-                        <img src="<?php echo htmlspecialchars($item['image']); ?>"
-                             class="img-fluid rounded-start" alt="<?php echo htmlspecialchars($item['title']); ?>">
-                    </div>
-                    <div class="col-md-8">
-                        <div class="card-body">
-                            <h5 class="card-title">
-                                <a href="?action=news&method=detail&id=<?php echo $item['id']; ?>" class="text-decoration-none">
-                                    <?php echo htmlspecialchars($item['title']); ?>
-                                </a>
-                            </h5>
-                            <p class="card-text"><?php echo substr(htmlspecialchars($item['content']), 0, 200) . '...'; ?></p>
-                            <p class="card-text">
-                                <small class="text-muted">
-                                    Đăng ngày: <?php echo date('d/m/Y', strtotime($item['created_at'])); ?>
-                                </small>
-                            </p>
-                        </div>
+    </nav>
+
+    <!-- Tiêu đề trang -->
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Danh Sách Tin Tức</h1>
+
+        <!-- Form tìm kiếm tin tức -->
+        <form action="index.php?controller=home&action=search" method="GET" class="mb-4">
+            <div class="input-group">
+                <input type="text" name="keyword" class="form-control" placeholder="Tìm kiếm tin tức..." required>
+                <button class="btn btn-primary" type="submit">Tìm kiếm</button>
+            </div>
+        </form>
+
+        <!-- Hiển thị danh sách tin tức -->
+        <div class="row">
+            <?php if (empty($news)): ?>
+                <div class="col-12">
+                    <div class="alert alert-warning" role="alert">
+                        Không có tin tức nào để hiển thị.
                     </div>
                 </div>
-            </div>
-        <?php endforeach; ?>
-    </div>
-    
-    <div class="col-md-4">
-        <div class="card">
-            <div class="card-header">
-                <h3>Danh Mục</h3>
-            </div>
-            <div class="list-group list-group-flush">
-                <?php foreach ($_SESSION['category'] as $category): ?>
-                    <a href="?action=filter&categoryId=<?php echo $category['id']; ?>" 
-                       class="list-group-item list-group-item-action">
-                        <?php echo htmlspecialchars($category['name']); ?>
-                    </a>
+            <?php else: ?>
+                <?php foreach ($news as $item): ?>
+                    <div class="col-md-4 mb-4">
+                        <div class="card">
+                            <img src="<?= htmlspecialchars($item['image']) ?>" class="card-img-top" alt="<?= htmlspecialchars($item['title']) ?>">
+                            <div class="card-body">
+                                <h5 class="card-title"><?= htmlspecialchars($item['title']) ?></h5>
+                                <p class="card-text"><?= htmlspecialchars(substr($item['content'], 0, 150)) ?>...</p>
+                                <a href="index.php?controller=home&action=detail&id=<?= $item['id'] ?>" class="btn btn-primary">Xem chi tiết</a>
+                            </div>
+                        </div>
+                    </div>
                 <?php endforeach; ?>
-            </div>
+            <?php endif; ?>
         </div>
     </div>
-</div>
 
-<?php include 'views/footer.php'; ?>
+    <!-- Footer -->
+    <footer class="bg-light py-3 mt-5">
+        <div class="container text-center">
+            <p>&copy; 2024 Trang Tin Tức. Tất cả quyền lợi được bảo lưu.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
